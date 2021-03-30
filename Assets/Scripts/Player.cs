@@ -30,6 +30,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
+            rb.AddForce(Vector3.left * speed);
             CmdPlayerJump();
         }
         HandleMovement();        
@@ -48,7 +49,7 @@ public class Player : NetworkBehaviour
     void ClientPlayerJumped()
     {
         Debug.Log($"Player {netId} just jumped!");
-        rb.AddForce(Vector3.left * speed);
+        //rb.AddForce(Vector3.left * speed);
     }
 
  
