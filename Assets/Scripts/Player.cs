@@ -8,6 +8,7 @@ public class Player : NetworkBehaviour
 
     private Rigidbody2D rb;
     public float speed = 20f;
+    public float max_speed = 20f;
     void HandleMovement()
     {
         if (isLocalPlayer)
@@ -18,6 +19,8 @@ public class Player : NetworkBehaviour
             var dir = new Vector3(horizontal, vertical, 0);
 
             rb.AddForce(dir * speed * Time.deltaTime);
+            rb.velocity = Vector3.ClampMagnitude(rb.velocity, max_speed);
+            Debug.Log(rb.velocity.magnitude);
         }
     }
 
@@ -30,6 +33,7 @@ public class Player : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
+            rb.AddForce(Vector3.left * speed);
             CmdPlayerJump();
         }
         HandleMovement();        
@@ -48,7 +52,7 @@ public class Player : NetworkBehaviour
     void ClientPlayerJumped()
     {
         Debug.Log($"Player {netId} just jumped!");
-        rb.AddForce(Vector3.left * speed);
+        //rb.AddForce(Vector3.left * speed);
     }
 
  
