@@ -119,6 +119,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   speed: 1000
+  max_speed: 20
 --- !u!50 &5588155153103094068
 Rigidbody2D:
   serializedVersion: 4

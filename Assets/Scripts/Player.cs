@@ -8,6 +8,7 @@ public class Player : NetworkBehaviour
 
     private Rigidbody2D rb;
     public float speed = 20f;
+    public float max_speed = 1000f;
     void HandleMovement()
     {
         if (isLocalPlayer)
@@ -18,6 +19,8 @@ public class Player : NetworkBehaviour
             var dir = new Vector3(horizontal, vertical, 0);
 
             rb.AddForce(dir * speed * Time.deltaTime);
+            rb.velocity = Vector3.ClampMagnitude(rb.velocity, max_speed);
+            Debug.Log(rb.velocity.magnitude);
         }
     }
 
