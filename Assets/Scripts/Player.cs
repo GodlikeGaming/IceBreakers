@@ -8,7 +8,7 @@ public class Player : NetworkBehaviour
 
     private Rigidbody2D rb;
     public float speed = 20f;
-    public float max_speed = 1000f;
+    public float max_speed = 20f;
     void HandleMovement()
     {
         if (isLocalPlayer)
