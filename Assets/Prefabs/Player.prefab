@@ -120,6 +120,8 @@ MonoBehaviour:
   syncInterval: 0.1
   speed: 1000
   max_speed: 20
+  prefab_lr_holder: {fileID: 8179364531807626656, guid: 4824291f28314084aaf29a6d0d3002e4,
+    type: 3}
 --- !u!50 &5588155153103094068
 Rigidbody2D:
   serializedVersion: 4
