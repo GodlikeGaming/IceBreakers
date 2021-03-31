@@ -62,24 +62,6 @@ public class Player : NetworkBehaviour
             AngularVelocity = rb.angularVelocity;
         }
 
-        if (Time.time - last_sync > sync_cd) {
-
-            if (isClient)//if we are a client update our rigidbody with the servers rigidbody info
-            {
-
-                //StartCoroutine(SyncRBOverTime(0.0f));
-                if (hasAuthority) { 
-                    CmdSetVelocity(rb.velocity);
-                    CmdSetPosition(rb.position);
-                }
-                else
-                {
-                    StartCoroutine(SyncRBOverTime(0.0f));
-                }
-            }
-            last_sync = Time.time;
-        }
-
     }
     
 
@@ -91,7 +73,7 @@ public class Player : NetworkBehaviour
         {
             
             var lerp_scale = duration == 0.0f ? 0f : curr_time / duration;
-            rb.position = Vector2.Lerp(new Vector2(Position.x, Position.y) + rb.velocity * (float)NetworkTime.rtt, rb.position, lerp_scale);//account for the lag and update our varibles
+            rb.position = Vector2.Lerp(Position + Velocity * (float)NetworkTime.rtt, rb.position, lerp_scale);//account for the lag and update our varibles
             rb.rotation = Mathf.Lerp(Rotation * AngularVelocity * (float)NetworkTime.rtt, rb.rotation, lerp_scale);
             rb.velocity = Vector3.Lerp(Velocity, rb.velocity, lerp_scale);
             rb.angularVelocity = Mathf.Lerp(AngularVelocity, rb.angularVelocity, lerp_scale);
@@ -119,15 +101,43 @@ public class Player : NetworkBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void FixedUpdate()
+    {
+        HandleMovement();
+    }
+
     void Update()
     {
         HandlePathDrawer();
-        HandleMovement();        
+        HandleSyncing();
 
         if (isServer)
         {
             // Update rigidbodies and positions
 
+        }
+    }
+
+    private void HandleSyncing()
+    {
+        if (Time.time - last_sync > sync_cd)
+        {
+
+            if (isClient)//if we are a client update our rigidbody with the servers rigidbody info
+            {
+
+                //StartCoroutine(SyncRBOverTime(0.0f));
+                if (hasAuthority)
+                {
+                    CmdSetVelocity(rb.velocity);
+                    CmdSetPosition(rb.position);
+                }
+                else
+                {
+                    StartCoroutine(SyncRBOverTime(0.0f));
+                }
+            }
+            last_sync = Time.time;
         }
     }
 
