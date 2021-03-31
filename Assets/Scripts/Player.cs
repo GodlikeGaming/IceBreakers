@@ -22,6 +22,7 @@ public class Player : NetworkBehaviour
 
     public float speed = 20f;
     public float max_speed = 20f;
+    private bool jumping = false;
 
     PathDrawer pd;
 
@@ -39,7 +40,8 @@ public class Player : NetworkBehaviour
             // Handle jump input
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                rb.AddForce(Vector3.left * speed);
+                Jump();
+                //CmdAddForce(Vector3.up * speed / 5);
                 CmdPlayerJump(); // send msg to server
             }
 
@@ -81,8 +83,39 @@ public class Player : NetworkBehaviour
         }
 
     }
-    
 
+    IEnumerator SetGravityAfterSeconds(float gravity, float seconds)
+    {
+        var pos = rb.position;
+        var max_height = 20f;
+
+        var curr_height = 0f;
+        var i = 1f;
+        var step_size = 0.1f;
+        var n = max_height / step_size;
+        var prev_time = Time.time;
+        while (true) { 
+            if (curr_height > max_height)
+            {
+                i *= -1;
+            }
+            if (curr_height < 0)
+            {
+                FinishJump();
+                yield break;
+            }
+            var y = step_size * i;
+            var desired_position = new Vector2(rb.position.x, rb.position.y + y);
+            curr_height += y;
+
+            rb.MovePosition(desired_position + (rb.velocity * 0.01f));
+            prev_time = Time.time;
+            yield return new WaitForSeconds(0.001f);
+        }
+        //rb.gravityScale = gravity;
+    }
+
+   
     IEnumerator SyncRBOverTime(float duration)
     {
         var curr_time = 0.0f;
@@ -122,11 +155,20 @@ public class Player : NetworkBehaviour
     void Update()
     {
         HandlePathDrawer();
-        HandleMovement();        
+        HandleMovement();
+        
 
         if (isServer)
         {
             // Update rigidbodies and positions
+
+        }
+    }
+
+    private void HandleJumping()
+    {
+        if (jumping)
+        {
 
         }
     }
@@ -152,6 +194,22 @@ public class Player : NetworkBehaviour
         pd.SetPositions(positions.ToList());
     }
 
+    void Jump()
+    {
+        //rb.AddForce(Vector3.up * speed / 5);
+        //rb.gravityScale = 1f;
+        pd.freeze = true;
+        StartCoroutine(SetGravityAfterSeconds(0, 1f));
+    }
+
+    private void FinishJump()
+    {
+        var lr_holder = Instantiate(prefab_lr_holder) as GameObject;
+        lr_holder.transform.parent = transform;
+        pd = lr_holder.GetComponent<PathDrawer>();
+    }
+
+
     [Command]
     private void CmdSetPosition(Vector2 position)
     {
@@ -175,7 +233,9 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdPlayerJump()
     {
-        Debug.Log("Player jumped, now telling the clients!");
+        positions.Clear();
+        Jump();
+
         ClientPlayerJumped();
     }
 
@@ -183,8 +243,7 @@ public class Player : NetworkBehaviour
     [ClientRpc]
     void ClientPlayerJumped()
     {
-        Debug.Log($"Player {netId} just jumped!");
-        //rb.AddForce(Vector3.left * speed);
+        Jump();
     }
 
  
