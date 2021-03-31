@@ -118,8 +118,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  Velocity: {x: 0, y: 0, z: 0}
+  Rotation: 0
+  Position: {x: 0, y: 0, z: 0}
+  AngularVelocity: 0
   speed: 1000
-  max_speed: 20
+  max_speed: 10
   prefab_lr_holder: {fileID: 8179364531807626656, guid: 4824291f28314084aaf29a6d0d3002e4,
     type: 3}
 --- !u!50 &5588155153103094068
