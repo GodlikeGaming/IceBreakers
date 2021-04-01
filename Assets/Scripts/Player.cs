@@ -22,29 +22,28 @@ public class Player : NetworkBehaviour
 
     public float speed = 20f;
     public float max_speed = 20f;
-    private bool jumping = false;
+    public bool jumping = false;
 
     PathDrawer pd;
 
     SyncList<Vector3> positions = new SyncList<Vector3>();
-    public float sync_cd = 1.0f;
+    public float sync_cd = 0.1f;
 
     public GameObject prefab_lr_holder;
 
 
     float last_sync = 0.0f;
+    public float max_height = 2f;
+
+    float curr_height = 0f;
+    float i = 1f;
+    float step_size = 0.1f;
     void HandleMovement()
     {
         if (isLocalPlayer)
         {
             // Handle jump input
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                Jump();
-                //CmdAddForce(Vector3.up * speed / 5);
-                CmdPlayerJump(); // send msg to server
-            }
-
+            
             // handles WASD movement
             float horizontal = Input.GetAxis("Horizontal");
             float vertical = Input.GetAxis("Vertical");
@@ -64,57 +63,9 @@ public class Player : NetworkBehaviour
             AngularVelocity = rb.angularVelocity;
         }
 
-        if (Time.time - last_sync > sync_cd) {
-
-            if (isClient)//if we are a client update our rigidbody with the servers rigidbody info
-            {
-
-                //StartCoroutine(SyncRBOverTime(0.0f));
-                if (hasAuthority) { 
-                    CmdSetVelocity(rb.velocity);
-                    CmdSetPosition(rb.position);
-                }
-                else
-                {
-                    StartCoroutine(SyncRBOverTime(0.0f));
-                }
-            }
-            last_sync = Time.time;
-        }
-
     }
 
-    IEnumerator SetGravityAfterSeconds(float gravity, float seconds)
-    {
-        var pos = rb.position;
-        var max_height = 20f;
-
-        var curr_height = 0f;
-        var i = 1f;
-        var step_size = 0.1f;
-        var n = max_height / step_size;
-        var prev_time = Time.time;
-        while (true) { 
-            if (curr_height > max_height)
-            {
-                i *= -1;
-            }
-            if (curr_height < 0)
-            {
-                FinishJump();
-                yield break;
-            }
-            var y = step_size * i;
-            var desired_position = new Vector2(rb.position.x, rb.position.y + y);
-            curr_height += y;
-
-            rb.MovePosition(desired_position + (rb.velocity * 0.01f));
-            prev_time = Time.time;
-            yield return new WaitForSeconds(0.001f);
-        }
-        //rb.gravityScale = gravity;
-    }
-
+  
    
     IEnumerator SyncRBOverTime(float duration)
     {
@@ -124,7 +75,7 @@ public class Player : NetworkBehaviour
         {
             
             var lerp_scale = duration == 0.0f ? 0f : curr_time / duration;
-            rb.position = Vector2.Lerp(new Vector2(Position.x, Position.y) + rb.velocity * (float)NetworkTime.rtt, rb.position, lerp_scale);//account for the lag and update our varibles
+            rb.position = Vector2.Lerp(Position + Velocity * (float)NetworkTime.rtt, rb.position, lerp_scale);//account for the lag and update our varibles
             rb.rotation = Mathf.Lerp(Rotation * AngularVelocity * (float)NetworkTime.rtt, rb.rotation, lerp_scale);
             rb.velocity = Vector3.Lerp(Velocity, rb.velocity, lerp_scale);
             rb.angularVelocity = Mathf.Lerp(AngularVelocity, rb.angularVelocity, lerp_scale);
@@ -142,22 +93,49 @@ public class Player : NetworkBehaviour
         
     }
 
-    void Start()
+    void SpawnPathDrawer()
     {
         var lr_holder = Instantiate(prefab_lr_holder) as GameObject;
         lr_holder.transform.parent = transform;
         pd = lr_holder.GetComponent<PathDrawer>();
 
+        //NetworkServer.Spawn(lr_holder, gameObject);
+    }
+
+    Vector2 shadow_offset;
+    public GameObject shadow_prefab;
+    public GameObject shadow;
+    public float jump_start_y = 0f;
+    public float accumulated_rb_jump_y = 0f;
+    void Start()
+    {
+        shadow = Instantiate(shadow_prefab) as GameObject;
+        shadow_offset = new Vector2(shadow.transform.position.x, shadow.transform.position.y);
+        shadow.transform.parent = transform;
+
+        SpawnPathDrawer(); 
+
 
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    public override void OnStartClient()
+    {
+        Debug.Log("I joined!");
+    }
+
+    private void FixedUpdate()
+    {
+        HandleMovement();
+        HandleJumping();
     }
 
     void Update()
     {
         HandlePathDrawer();
-        HandleMovement();
-        
-
+        HandleSyncing();
+        HandleInput();
+        HandleShadow();
         if (isServer)
         {
             // Update rigidbodies and positions
@@ -165,11 +143,70 @@ public class Player : NetworkBehaviour
         }
     }
 
+    private void HandleShadow()
+    {
+        if (!jumping) shadow.transform.position = rb.position + shadow_offset;
+    }
+
+    private void HandleInput()
+    {
+        if ( isLocalPlayer) { 
+            if (Input.GetKeyDown(KeyCode.Space) && !jumping)
+            {
+                Jump();
+                //CmdAddForce(Vector3.up * speed / 5);
+                CmdPlayerJump(); // send msg to server
+            }
+        }
+    }
+
     private void HandleJumping()
     {
         if (jumping)
         {
+            if (curr_height > max_height)
+            {
+                i *= -1;
+            }
+            if (curr_height < 0)
+            {
+                FinishJump();
+                return;
+            }
+            var y = step_size * i;
+            shadow.transform.localScale -= shadow.transform.localScale * y / 4;
+            var desired_position = new Vector2(rb.position.x, rb.position.y + y);
+            curr_height += y;
 
+
+           // shadow.transform.position = rb.position;
+            var pos = shadow_offset + (desired_position + (rb.velocity * Time.deltaTime * 0.5f));
+            accumulated_rb_jump_y += y;//(rb.velocity * Time.deltaTime * 0.5f).y;
+            shadow.transform.position = new Vector2(pos.x, pos.y - accumulated_rb_jump_y);
+            rb.MovePosition(desired_position + (rb.velocity * Time.deltaTime * 0.5f));
+        }
+    }
+
+    private void HandleSyncing()
+    {
+        if (Time.time - last_sync > sync_cd)
+        {
+
+            if (isClient)//if we are a client update our rigidbody with the servers rigidbody info
+            {
+
+                //StartCoroutine(SyncRBOverTime(0.0f));
+                if (hasAuthority)
+                {
+                    CmdSetVelocity(rb.velocity);
+                    CmdSetPosition(rb.position);
+                }
+                else
+                {
+                    StartCoroutine(SyncRBOverTime(0.0f));
+                }
+            }
+            last_sync = Time.time;
         }
     }
 
@@ -198,15 +235,19 @@ public class Player : NetworkBehaviour
     {
         //rb.AddForce(Vector3.up * speed / 5);
         //rb.gravityScale = 1f;
+        jump_start_y = rb.position.y;
+        accumulated_rb_jump_y = 0;
         pd.freeze = true;
-        StartCoroutine(SetGravityAfterSeconds(0, 1f));
+        jumping = true;
+        //StartCoroutine(SetGravityAfterSeconds(0, 1f));
     }
 
     private void FinishJump()
     {
-        var lr_holder = Instantiate(prefab_lr_holder) as GameObject;
-        lr_holder.transform.parent = transform;
-        pd = lr_holder.GetComponent<PathDrawer>();
+        SpawnPathDrawer();
+        jumping = false;
+        curr_height = 0;
+        i = 1f;
     }
 
 
