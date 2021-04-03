@@ -24,13 +24,13 @@ public class MeshGenerator : MonoBehaviour
     public float GracePeriod = 5.0f;
     public int SortingLayer = 0;
     public bool UseEgdeCollider = false;
+    public List<Vector2> edge_points;
 
 
     private MeshRenderer meshRenderer;
     private Mesh msh;
-
-    public EdgeCollider2D col;
-    public List<Vector2> edge_points;
+    private EdgeCollider2D col;
+    private Vector2 Center;
     void Start()
     {
         if(UseEgdeCollider) col = GetComponent<EdgeCollider2D>();
@@ -50,6 +50,8 @@ public class MeshGenerator : MonoBehaviour
         Triangulator tr = new Triangulator(vertices2D);
         int[] indices = tr.Triangulate();
 
+        Center = Geometry.GetCenterOfPolygon2D(vertices2D.ToList());
+
         // Create the Vector3 vertices
         Vector3[] vertices = new Vector3[vertices2D.Length];
         for (int i = 0; i < vertices.Length; i++)
@@ -61,15 +63,19 @@ public class MeshGenerator : MonoBehaviour
         msh = new Mesh
         {
             vertices = vertices,
-            triangles = indices
+            triangles = indices,
         };
         msh.RecalculateNormals();
         msh.RecalculateBounds();
 
-        edge_points = vertices2D.ToList();
-        edge_points.Add(vertices2D[0]);
-        if (UseEgdeCollider) col.points = edge_points.ToArray();
-        
+        if (UseEgdeCollider)
+        {
+            col.points = edge_points.ToArray();
+            edge_points = vertices2D.ToList();
+            edge_points.Add(vertices2D[0]);
+        }
+
+
         // Set up game object with mesh;
         gameObject.AddComponent(typeof(MeshRenderer));
         meshRenderer = gameObject.GetComponent<MeshRenderer>();
@@ -78,7 +84,6 @@ public class MeshGenerator : MonoBehaviour
         MeshFilter filter = gameObject.AddComponent(typeof(MeshFilter)) as MeshFilter;
         filter.mesh = msh;
     }
-
 
     private float localTimer = 0.0f;
     private float scaleTimer = 0.0f;
@@ -91,14 +96,35 @@ public class MeshGenerator : MonoBehaviour
             if (localTimer >= GracePeriod)
             {
                 scaleTimer += Time.deltaTime;
-                if (scaleTimer > 2.0f )
-                { 
-                    RescaleMesh(0.9f);
+                if (scaleTimer > 0.5f)
+                {
+                    //RescaleMesh(0.9f);
+
+                    ScaleAround(Center,  transform.localScale * 0.98f);
                     scaleTimer = 0.0f;
                 }
             }
         }
     }
+
+    public void ScaleAround(Vector3 pivot, Vector3 newScale)
+    {
+        Vector3 A = transform.localPosition;
+        Vector3 B = pivot;
+
+        Vector3 C = A - B; // diff from object pivot to desired pivot/origin
+
+        float RS = newScale.x / transform.localScale.x; // relataive scale factor
+
+        // calc final position post-scale
+        Vector3 FP = B + C * RS;
+
+        // finally, actually perform the scale/translation
+        transform.localScale = newScale;
+        transform.localPosition = FP;
+    }
+
+
 
     private void RescaleMesh(float scale)
     {

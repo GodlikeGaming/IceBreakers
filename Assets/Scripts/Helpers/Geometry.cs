@@ -136,16 +136,32 @@ public class Geometry
         return false; // Doesn't fall in any of the above cases
     }
 
-    
+    public static Vector3 GetCenterOfPolygon3D(List<Vector3> poly)
+    {
+        var n = poly.Count;
+        var center_x = poly.Select(i => i.x).Sum() / n;
+        var center_y = poly.Select(i => i.y).Sum() / n;
+        var center_z = poly.Select(i => i.z).Sum() / n;
+
+        return new Vector3(center_x, center_y, center_z);
+    }
+    public static Vector2 GetCenterOfPolygon2D(List<Vector2> poly)
+    {
+        var n = poly.Count;
+        var center_x = poly.Select(i => i.x).Sum() / n;
+        var center_y = poly.Select(i => i.y).Sum() / n;
+
+        return new Vector2(center_x, center_y);
+    }
+
+
+
+
     // HACKY SOLUTIONS! WILL NOT WORK ON ALL TYPES OF POLYGONS
     internal static Vector2 PointNearEdgeOfPolygon(List<Vector2> polygon)
     {
-        var n = polygon.Count();
-        var center_x = polygon.Select(i => i.x).Sum() / n;
-        var center_y = polygon.Select(i => i.y).Sum() / n;
-
-        var center = new Vector2(center_x, center_y);
-        var point = polygon[UnityEngine.Random.Range(0, n)];
+        var center = GetCenterOfPolygon2D(polygon);
+        var point = polygon[UnityEngine.Random.Range(0, polygon.Count)];
 
         //Debug.Log($"p: {point}, center: {center}");
         return center + (point - center) * 0.9f;
