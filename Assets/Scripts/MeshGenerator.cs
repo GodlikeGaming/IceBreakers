@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MeshGenerator : MonoBehaviour
@@ -27,9 +28,13 @@ public class MeshGenerator : MonoBehaviour
     private MeshRenderer meshRenderer;
     private Mesh msh;
 
+    public EdgeCollider2D col;
+    public List<Vector2> edge_points;
     void Start()
     {
         //find additional points between 
+        col = GetComponent<EdgeCollider2D>();
+        //col.isTrigger = true;
 
         CurveHandler curveHandler = new CurveHandler(ControlPoints);
 
@@ -56,6 +61,10 @@ public class MeshGenerator : MonoBehaviour
         msh.RecalculateNormals();
         msh.RecalculateBounds();
 
+        edge_points = vertices2D.ToList();
+        edge_points.Add(vertices2D[0]);
+        col.points = edge_points.ToArray();
+        
         // Set up game object with mesh;
         gameObject.AddComponent(typeof(MeshRenderer));
         meshRenderer = gameObject.GetComponent<MeshRenderer>();
@@ -107,6 +116,11 @@ public class MeshGenerator : MonoBehaviour
 
         msh.RecalculateNormals();
         msh.RecalculateBounds();
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        other.GetComponent<Rigidbody2D>().velocity = Vector2.right;
     }
 
 }
