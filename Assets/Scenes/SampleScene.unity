@@ -271,7 +271,8 @@ MonoBehaviour:
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 8179364531807626656, guid: 4824291f28314084aaf29a6d0d3002e4, type: 3}
 --- !u!4 &13129544
 Transform:
   m_ObjectHideFlags: 0
@@ -339,7 +340,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 20
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

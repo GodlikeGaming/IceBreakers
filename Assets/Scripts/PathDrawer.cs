@@ -13,8 +13,9 @@ public class PathDrawer : MonoBehaviour
     Vector3 previous_pos;
    
     float min_distance = 0.5f;
+    internal bool freeze;
 
-    
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -38,6 +39,7 @@ public class PathDrawer : MonoBehaviour
 
     internal Vector3? AddPosition(Vector3 current_pos, float min_distance_scale = 1f)
     {
+        if (freeze) return null;
         if (Vector3.Distance(previous_pos, current_pos) > min_distance * min_distance_scale)
         {            
             previous_pos = current_pos;
@@ -49,6 +51,7 @@ public class PathDrawer : MonoBehaviour
 
     internal void SetPositions(List<Vector3> positions)
     {
+        if (freeze) return;
         lr.positionCount = positions.Count();
         lr.SetPositions(positions.ToArray());
     }
