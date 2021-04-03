@@ -102,7 +102,7 @@ public class Player : NetworkBehaviour
     void SpawnPathDrawer()
     {
         var lr_holder = Instantiate(prefab_lr_holder) as GameObject;
-        lr_holder.transform.parent = transform;
+        //lr_holder.transform.parent = transform;
         pd = lr_holder.GetComponent<PathDrawer>();
 
         dp.AddPD(pd);

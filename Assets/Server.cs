@@ -15,5 +15,6 @@ public class Server : NetworkManager
         
         GameObject player = (GameObject)Instantiate(playerPrefab, position, Quaternion.identity);
         NetworkServer.AddPlayerForConnection(conn, player);
+
     }
 }
