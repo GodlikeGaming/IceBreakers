@@ -7,17 +7,13 @@ public class MeshGenerator : MonoBehaviour
 
     public Vector2[] ControlPoints = new Vector2[] {
             new Vector2(0,0),
-            new Vector2(0,50),
-            new Vector2(50,50),
-            new Vector2(50,100),
-            new Vector2(0,100),
-            new Vector2(0,150),
-            new Vector2(150,150),
-            new Vector2(150,100),
-            new Vector2(100,100),
-            new Vector2(100,50),
-            new Vector2(150,50),
-            new Vector2(150,0),
+            new Vector2(-10,15),
+            new Vector2(10,25),
+            new Vector2(45,35),
+            new Vector2(55,25),
+            new Vector2(50,15),
+            new Vector2(45,-10),
+            new Vector2(32,-3)
         };
 
     public int segments = 20;
