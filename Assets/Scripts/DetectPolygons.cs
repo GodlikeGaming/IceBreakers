@@ -72,7 +72,7 @@ public class DetectPolygons : MonoBehaviour
         meshComp.ControlPoints = points;
         meshComp.Segments = 10;
         meshComp.Mat = DeadZoneMaterial;
-        meshComp.sortingLayer = 0;
+        meshComp.SortingLayer = 0;
     }
 
 
@@ -88,6 +88,6 @@ public class DetectPolygons : MonoBehaviour
         meshComp.ControlPoints = points;
         meshComp.Segments = 10;
         meshComp.Mat = IceMaterial;
-        meshComp.sortingLayer = 1;
+        meshComp.SortingLayer = 1;
     }
 }

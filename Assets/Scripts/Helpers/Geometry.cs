@@ -16,27 +16,6 @@ public class Geometry
         else return null;
     }
 
-    //public static List<Vector3>? GetPointsForMesh(List<Vector3> path)
-    //{
-    //    var arr = path.ToArray();
-
-    //    var list = new List<Vector3>();
-        
-    //    for (int i = arr.Length-1; i > 0; i--)
-    //    {
-    //        list.Add(arr[i]); // add elements from the back untill the intersection is encountered
-
-    //        for (int j = 1; j < arr.Length; j++) {
-    //            if (i == j) continue;
-    //            if (Mathf.Abs(j - i) <= 1) continue;
-    //            var intersection = Intersection(arr[i], arr[i-1], arr[j - 1], arr[j]);
-
-    //            if (intersection.HasValue) return list;
-    //        }
-    //    }
-    //    return null;
-    //}
-
     public static Vector2[] IntersectsWithItself(List<Vector3> path)
     {
         var arr = path.ToArray();

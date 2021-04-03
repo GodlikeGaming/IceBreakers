@@ -22,7 +22,9 @@ public class MeshGenerator : MonoBehaviour
     public Material Mat;
     public bool Shrink = false;
     public float GracePeriod = 5.0f;
-    public int sortingLayer = 0;
+    public int SortingLayer = 0;
+    public bool UseEgdeCollider = false;
+
 
     private MeshRenderer meshRenderer;
     private Mesh msh;
@@ -31,7 +33,7 @@ public class MeshGenerator : MonoBehaviour
     public List<Vector2> edge_points;
     void Start()
     {
-        col = GetComponent<EdgeCollider2D>();
+        if(UseEgdeCollider) col = GetComponent<EdgeCollider2D>();
         Init();
     }
 
@@ -66,12 +68,12 @@ public class MeshGenerator : MonoBehaviour
 
         edge_points = vertices2D.ToList();
         edge_points.Add(vertices2D[0]);
-        col.points = edge_points.ToArray();
+        if (UseEgdeCollider) col.points = edge_points.ToArray();
         
         // Set up game object with mesh;
         gameObject.AddComponent(typeof(MeshRenderer));
         meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        meshRenderer.sortingOrder = sortingLayer;
+        meshRenderer.sortingOrder = SortingLayer;
         meshRenderer.material = Mat;
         MeshFilter filter = gameObject.AddComponent(typeof(MeshFilter)) as MeshFilter;
         filter.mesh = msh;
