@@ -5,7 +5,7 @@ using UnityEngine;
 public class MeshGenerator : MonoBehaviour
 {
 
-    public Vector2[] vertices2D = new Vector2[] {
+    public Vector2[] ControlPoints = new Vector2[] {
             new Vector2(0,0),
             new Vector2(0,50),
             new Vector2(50,50),
@@ -28,15 +28,23 @@ public class MeshGenerator : MonoBehaviour
 
     private MeshRenderer meshRenderer;
     private Mesh msh;
+    private List<Vector2> vertices2D = new List<Vector2>();
 
     void Start()
     {
+        //find additional points between 
+
+
+
+
+
+
         // Use the triangulator to get indices for creating triangles
-        Triangulator tr = new Triangulator(vertices2D);
+        Triangulator tr = new Triangulator(vertices2D.ToArray());
         int[] indices = tr.Triangulate();
 
         // Create the Vector3 vertices
-        Vector3[] vertices = new Vector3[vertices2D.Length];
+        Vector3[] vertices = new Vector3[vertices2D.Count];
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = new Vector3(vertices2D[i].x, vertices2D[i].y, 0);
