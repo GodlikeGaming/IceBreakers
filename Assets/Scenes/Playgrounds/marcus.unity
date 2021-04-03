@@ -152,11 +152,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3face76e8a31cd4ea67f58e4839536a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vertices2D:
-  - {x: 0, y: 0}
-  - {x: 0, y: 3}
-  - {x: 3, y: 3}
-  - {x: 3, y: 0}
+  ControlPoints:
+  - {x: 5, y: 5}
+  - {x: 7, y: 7}
+  - {x: 10, y: 5}
+  - {x: 7, y: 3}
+  segments: 2
   mat: {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
   shrink: 1
   gracePeriod: 3
@@ -203,15 +204,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3face76e8a31cd4ea67f58e4839536a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vertices2D:
+  ControlPoints:
   - {x: 0, y: 0}
   - {x: -10, y: 15}
   - {x: 10, y: 25}
   - {x: 45, y: 35}
   - {x: 55, y: 25}
-  - {x: 50, y: 13}
-  - {x: 37, y: -4}
-  - {x: 30, y: -2}
+  - {x: 50, y: 15}
+  - {x: 45, y: -10}
+  - {x: 32, y: -3}
+  segments: 20
   mat: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   shrink: 0
   gracePeriod: 5
