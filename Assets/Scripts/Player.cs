@@ -38,6 +38,10 @@ public class Player : NetworkBehaviour
     float curr_height = 0f;
     float i = 1f;
     float step_size = 0.1f;
+
+    public DetectPolygons dp;
+
+    Collider2D col;
     void HandleMovement()
     {
         if (isLocalPlayer)
@@ -99,8 +103,11 @@ public class Player : NetworkBehaviour
         lr_holder.transform.parent = transform;
         pd = lr_holder.GetComponent<PathDrawer>();
 
+        dp.AddPD(pd);
         //NetworkServer.Spawn(lr_holder, gameObject);
     }
+
+    
 
     Vector2 shadow_offset;
     public GameObject shadow_prefab;
@@ -109,6 +116,8 @@ public class Player : NetworkBehaviour
     public float accumulated_rb_jump_y = 0f;
     void Start()
     {
+        col = GetComponent<BoxCollider2D>();
+        dp = FindObjectOfType<DetectPolygons>();
         shadow = Instantiate(shadow_prefab) as GameObject;
         shadow_offset = new Vector2(shadow.transform.position.x, shadow.transform.position.y);
         shadow.transform.parent = transform;
@@ -235,6 +244,7 @@ public class Player : NetworkBehaviour
     {
         //rb.AddForce(Vector3.up * speed / 5);
         //rb.gravityScale = 1f;
+        col.enabled = false;
         jump_start_y = rb.position.y;
         accumulated_rb_jump_y = 0;
         pd.freeze = true;
@@ -244,6 +254,7 @@ public class Player : NetworkBehaviour
 
     private void FinishJump()
     {
+        col.enabled = true;
         SpawnPathDrawer();
         jumping = false;
         curr_height = 0;

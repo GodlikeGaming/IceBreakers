@@ -15,6 +15,11 @@ public class PathDrawer : MonoBehaviour
     float min_distance = 0.5f;
     internal bool freeze;
 
+    internal bool cut = false;
+
+    public List<Vector3> positions = new List<Vector3>();
+
+
 
     // Start is called before the first frame update
     void Awake()
@@ -49,10 +54,12 @@ public class PathDrawer : MonoBehaviour
             ;
     }
 
+
     internal void SetPositions(List<Vector3> positions)
     {
         if (freeze) return;
         lr.positionCount = positions.Count();
         lr.SetPositions(positions.ToArray());
+        this.positions = positions;
     }
 }
