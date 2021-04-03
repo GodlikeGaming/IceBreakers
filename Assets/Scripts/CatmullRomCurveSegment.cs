@@ -22,7 +22,6 @@ public class CatmullRomCurveSegment
     {
         B = new Matrix4x4(cv1, cv2, cv3, cv4);
     }
-
     public Vector4 Evaluate(float u)
     {
         // compute parameter matrix U and evaluate p at u
@@ -56,17 +55,5 @@ public class CatmullRomCurveSegment
         Vector4 U = new Vector4(u * 6, 2, 0, 0); 
         Vector4 p = B * M * U; 
         return p;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

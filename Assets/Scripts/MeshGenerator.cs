@@ -37,7 +37,7 @@ public class MeshGenerator : MonoBehaviour
 
         CurveHandler curveHandler = new CurveHandler(ControlPoints);
 
-        Vector2[] vertices2D = curveHandler.EvalNewPoints(segments);
+        Vector2[] vertices2D = curveHandler.EvalSegmentPoints(segments);
 
 
         // Use the triangulator to get indices for creating triangles

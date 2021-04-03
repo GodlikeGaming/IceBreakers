@@ -28,7 +28,7 @@ using UnityEngine;
             }
         }
 
-        public Vector2[] EvalNewPoints(int segments)
+        public Vector2[] EvalSegmentPoints(int segments)
         {
             var list = new List<Vector2>();
 
