@@ -129,9 +129,12 @@ MonoBehaviour:
   prefab_lr_holder: {fileID: 8179364531807626656, guid: 4824291f28314084aaf29a6d0d3002e4,
     type: 3}
   max_height: 2
+  dp: {fileID: 0}
   shadow_prefab: {fileID: 4507699723304058852, guid: 5707c533bfa5c7a46a57314ca204ff33,
     type: 3}
   shadow: {fileID: 0}
+  jump_start_y: 0
+  accumulated_rb_jump_y: 0
 --- !u!50 &5588155153103094068
 Rigidbody2D:
   serializedVersion: 4

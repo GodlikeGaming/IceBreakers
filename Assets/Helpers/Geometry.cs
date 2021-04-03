@@ -157,4 +157,19 @@ public class Geometry
         return false; // Doesn't fall in any of the above cases
     }
 
+    
+    // HACKY SOLUTIONS! WILL NOT WORK ON ALL TYPES OF POLYGONS
+    internal static Vector2 PointNearEdgeOfPolygon(List<Vector2> polygon)
+    {
+        var n = polygon.Count();
+        var center_x = polygon.Select(i => i.x).Sum() / n;
+        var center_y = polygon.Select(i => i.y).Sum() / n;
+
+        var center = new Vector2(center_x, center_y);
+        var point = polygon[UnityEngine.Random.Range(0, n)];
+
+        //Debug.Log($"p: {point}, center: {center}");
+        return center + (point - center) * 0.9f;
+    }
+
 }
