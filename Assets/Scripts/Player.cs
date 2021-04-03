@@ -97,6 +97,8 @@ public class Player : NetworkBehaviour
         
     }
 
+
+
     void SpawnPathDrawer()
     {
         var lr_holder = Instantiate(prefab_lr_holder) as GameObject;
@@ -126,6 +128,8 @@ public class Player : NetworkBehaviour
 
 
         rb = GetComponent<Rigidbody2D>();
+
+        
     }
 
     public override void OnStartClient()

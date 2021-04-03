@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Geometry
@@ -130,4 +131,77 @@ public class Geometry
         return false; // Doesn't fall in any of the above cases
     }
 
+    internal static Vector2 PointInsidePolygon(List<Vector2> polygon, Collider2D col)
+    {
+        var i = 0;
+        for (i = 0; i < 500; i++)
+        {
+            var bounds = col.bounds;
+        
+            var p  = new Vector2(
+                UnityEngine.Random.Range(bounds.min.x, bounds.max.x),
+                UnityEngine.Random.Range(bounds.min.y, bounds.max.y)
+            );
+            if (isInside(polygon.ToArray(), polygon.Count(), p))
+            {
+                return p;
+            }
+        }
+        Debug.Log(i);
+        return polygon[UnityEngine.Random.Range(0, polygon.Count())];
+    }
+
+    internal static Vector2 PointNearEdgeOfPolygon(List<Vector2> polygon)
+    {
+        var n = polygon.Count();
+        var center_x = polygon.Select(i => i.x).Sum() / n;
+        var center_y = polygon.Select(i => i.y).Sum() / n;
+
+        var center = new Vector2(center_x, center_y);
+        var point = polygon[UnityEngine.Random.Range(0, n)];
+
+        //Debug.Log($"p: {point}, center: {center}");
+        return center + (point - center) * 0.9f;
+    }
+
+    static bool isInside(Vector2[] polygon, int n, Vector2 p)
+    {
+        // There must be at least 3 vertices in polygon[]
+        if (n < 3)
+        {
+            return false;
+        }
+
+        // Create a point for line segment from p to infinite
+        Vector2 extreme = new Vector2(Mathf.Infinity, p.y);
+
+        // Count intersections of the above line
+        // with sides of polygon
+        int count = 0, i = 0;
+        do
+        {
+            int next = (i + 1) % n;
+
+            // Check if the line segment from 'p' to
+            // 'extreme' intersects with the line
+            // segment from 'polygon[i]' to 'polygon[next]'
+            if (doIntersect(polygon[i],
+                            polygon[next], p, extreme))
+            {
+                // If the point 'p' is colinear with line
+                // segment 'i-next', then check if it lies
+                // on segment. If it lies, return true, otherwise false
+                if (orientation(polygon[i], p, polygon[next]) == 0)
+                {
+                    return onSegment(polygon[i], p,
+                                    polygon[next]);
+                }
+                count++;
+            }
+            i = next;
+        } while (i != 0);
+
+        // Return true if count is odd, false otherwise
+        return (count % 2 == 1); // Same as (count%2 == 1)
+    }
 }
