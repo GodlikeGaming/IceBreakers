@@ -16,23 +16,28 @@ public class Geometry
         else return null;
     }
 
-    public static Vector3? IntersectsWithItself(List<Vector3> path)
+    public static Vector2[] IntersectsWithItself(List<Vector3> path)
     {
         var arr = path.ToArray();
 
-        
+
         for (int i = 1; i < arr.Length; i++)
         {
-            for (int j = 1; j < arr.Length; j++) {
+            for (int j = 1; j < arr.Length; j++)
+            {
                 if (i == j) continue;
                 if (Mathf.Abs(j - i) <= 1) continue;
                 var intersection = Intersection(arr[i - 1], arr[i], arr[j - 1], arr[j]);
 
-                if (intersection.HasValue) return intersection;
+                if (intersection.HasValue)
+                {
+                    return arr.Skip(i).Select(v3 => new Vector2(v3.x, v3.y)).ToArray();
+                } 
             }
         }
-        return null;
+        return new Vector2[0];
     }
+
 
     public static Vector3? Intersects(List<Vector3> path1, List<Vector3> path2)
     {
