@@ -5,36 +5,40 @@ using UnityEngine;
 public class MeshGenerator : MonoBehaviour
 {
 
-    public Vector2[] ControlPoints = new Vector2[] {
-            new Vector2(0,0),
-            new Vector2(-10,15),
-            new Vector2(10,25),
-            new Vector2(45,35),
-            new Vector2(55,25),
-            new Vector2(50,15),
-            new Vector2(45,-10),
-            new Vector2(32,-3)
-        };
+    //public Vector2[] ControlPoints = new Vector2[] {
+    //        new Vector2(0,0),
+    //        new Vector2(-10,15),
+    //        new Vector2(10,25),
+    //        new Vector2(45,35),
+    //        new Vector2(55,25),
+    //        new Vector2(50,15),
+    //        new Vector2(45,-10),
+    //        new Vector2(32,-3)
+    //    };
 
-    public int segments = 20;
-
-    public Material mat;
-
-    public bool shrink = false;
-
-    public float gracePeriod = 5.0f;
+    public Vector2[] ControlPoints = new Vector2[0];
+    public int Segments = 20;
+    public Material Mat;
+    public bool Shrink = false;
+    public float GracePeriod = 5.0f;
+    public int sortingLayer = 0;
 
     private MeshRenderer meshRenderer;
     private Mesh msh;
 
     void Start()
     {
-        //find additional points between 
+        Init();
+    }
 
+    public void Init()
+    {
+        if (ControlPoints.Length < 1 ) return;
+
+        //find additional points between the point for a smoother curvature
         CurveHandler curveHandler = new CurveHandler(ControlPoints);
 
-        Vector2[] vertices2D = curveHandler.EvalSegmentPoints(segments);
-
+        Vector2[] vertices2D = curveHandler.EvalSegmentPoints(Segments);
 
         // Use the triangulator to get indices for creating triangles
         Triangulator tr = new Triangulator(vertices2D);
@@ -59,7 +63,8 @@ public class MeshGenerator : MonoBehaviour
         // Set up game object with mesh;
         gameObject.AddComponent(typeof(MeshRenderer));
         meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        meshRenderer.material = mat;
+        meshRenderer.sortingOrder = sortingLayer;
+        meshRenderer.material = Mat;
         MeshFilter filter = gameObject.AddComponent(typeof(MeshFilter)) as MeshFilter;
         filter.mesh = msh;
     }
@@ -69,11 +74,11 @@ public class MeshGenerator : MonoBehaviour
     private float scaleTimer = 0.0f;
     public void Update()
     {
-        if (shrink)
+        if (Shrink)
         {
             localTimer += Time.deltaTime;
 
-            if (localTimer >= gracePeriod)
+            if (localTimer >= GracePeriod)
             {
                 scaleTimer += Time.deltaTime;
                 if (scaleTimer > 2.0f )
