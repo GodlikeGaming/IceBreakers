@@ -16,6 +16,8 @@ public class Server : NetworkManager
         GameObject player = (GameObject)Instantiate(playerPrefab, position, Quaternion.identity);
         NetworkServer.AddPlayerForConnection(conn, player);
 
+        AddPathDrawer(player);
+
     }
 
     public void AddSnowball(Vector2 pos, Vector2 dir, GameObject player)
@@ -34,6 +36,19 @@ public class Server : NetworkManager
        
         NetworkServer.Spawn(snowball);
         //IgnoreCol(snowball, player);
+    }
+
+    public void AddPathDrawer(GameObject player)
+    {
+        GameObject pd_obj = (GameObject)Instantiate(spawnPrefabs[0], player.transform.position, Quaternion.identity);
+
+        pd_obj.transform.parent = transform;
+        var pd = pd_obj.GetComponent<PathDrawer>();
+        pd.player = player;
+
+        FindObjectOfType<DetectPolygons>().AddPD(pd);
+
+        NetworkServer.Spawn(pd_obj);
     }
 
     

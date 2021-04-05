@@ -23,7 +23,7 @@ public class DetectPolygons : MonoBehaviour
 
         // Check for polygons
 
-        var paths = pds.Where(pd => !pd.cut).Select(pd => (pd, pd.positions)).ToList();
+        var paths = pds.Where(pd => !pd.cut).Select(pd => (pd, pd.positions.ToList())).ToList();
 
         FindPolygon(paths);
     }
@@ -40,8 +40,7 @@ public class DetectPolygons : MonoBehaviour
                 GenerateDeadZone(points);
                 GenerateShrinkingIce(points);
 
-                pd.freeze = true;
-                pd.cut = true;
+                pd.StopAndCreateNew();
                 break;
             }
 
