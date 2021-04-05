@@ -26,9 +26,8 @@ public class Player : NetworkBehaviour
     public float max_speed = 20f;
     public bool jumping = false;
 
-    PathDrawer pd;
+    public PathDrawer pd;
 
-    SyncList<Vector3> positions = new SyncList<Vector3>();
 
     public GameObject prefab_lr_holder;
 
@@ -39,7 +38,6 @@ public class Player : NetworkBehaviour
     float i = 1f;
     float step_size = 0.1f;
 
-    public DetectPolygons dp;
 
     Collider2D col;
     void HandleMovement()
@@ -97,18 +95,6 @@ public class Player : NetworkBehaviour
         
     }
 
-
-
-    void SpawnPathDrawer()
-    {
-        var lr_holder = Instantiate(prefab_lr_holder) as GameObject;
-        lr_holder.transform.parent = transform;
-        pd = lr_holder.GetComponent<PathDrawer>();
-
-        dp.AddPD(pd);
-        //NetworkServer.Spawn(lr_holder, gameObject);
-    }
-
     
 
     Vector2 shadow_offset;
@@ -119,12 +105,9 @@ public class Player : NetworkBehaviour
     void Start()
     {
         col = GetComponent<BoxCollider2D>();
-        dp = FindObjectOfType<DetectPolygons>();
         shadow = Instantiate(shadow_prefab) as GameObject;
         shadow_offset = new Vector2(shadow.transform.position.x, shadow.transform.position.y);
         shadow.transform.parent = transform;
-
-        SpawnPathDrawer(); 
 
 
         rb = GetComponent<Rigidbody2D>();
@@ -145,7 +128,6 @@ public class Player : NetworkBehaviour
 
     void Update()
     {
-        HandlePathDrawer();
         HandleSyncing();
         HandleInput();
         HandleShadow();
@@ -235,43 +217,26 @@ public class Player : NetworkBehaviour
         }
     }
 
-    private void HandlePathDrawer()
-    {
-        if (isLocalPlayer) {
-            
-        }
-
-        if (isServer)
-        {
-            var current_pos = transform.position;
-
-            var added = pd.AddPosition(current_pos);
-            if (added != null)
-            {
-                //CmdAddPosition(current_pos);
-                positions.Add(current_pos);
-            }
-        }
-
-        pd.SetPositions(positions.ToList());
-    }
-
+    
     void Jump()
     {
         //rb.AddForce(Vector3.up * speed / 5);
         //rb.gravityScale = 1f;
+        pd.Stop();
         col.enabled = false;
         jump_start_y = rb.position.y;
         accumulated_rb_jump_y = 0;
-        pd.freeze = true;
         jumping = true;
         //StartCoroutine(SetGravityAfterSeconds(0, 1f));
     }
 
     private void FinishJump()
     {
+        if (isServer)
+        {
+            FindObjectOfType<Server>().AddPathDrawer(gameObject);
+        }
         col.enabled = true;
-        SpawnPathDrawer();
         jumping = false;
         curr_height = 0;
         i = 1f;
@@ -308,7 +273,6 @@ public class Player : NetworkBehaviour
     [Command]
     void CmdPlayerJump()
     {
-        positions.Clear();
         Jump();
 
         ClientPlayerJumped();
