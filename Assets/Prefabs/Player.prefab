@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5588155153103094068}
   - component: {fileID: 6582392891696486610}
   - component: {fileID: 8533733255938368209}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,10 +122,10 @@ MonoBehaviour:
   Rotation: 0
   Position: {x: 0, y: 0, z: 0}
   AngularVelocity: 0
+  sync_cd: 1
   speed: 1000
   max_speed: 10
   jumping: 0
-  sync_cd: 1
   prefab_lr_holder: {fileID: 8179364531807626656, guid: 4824291f28314084aaf29a6d0d3002e4,
     type: 3}
   max_height: 2

@@ -17,4 +17,28 @@ public class Server : NetworkManager
         NetworkServer.AddPlayerForConnection(conn, player);
 
     }
+
+    public void AddSnowball(Vector2 pos, Vector2 dir, GameObject player)
+    {
+        Debug.Log(spawnPrefabs[1].name);
+        GameObject snowball = (GameObject)Instantiate(spawnPrefabs[1], pos, Quaternion.identity);
+
+        var movement = snowball.GetComponent<SnowballMovement>();
+        movement.ignorePlayer = player;
+        movement.Velocity = dir;
+        movement.Position = pos;
+
+       // var conn = NetworkServer.connections[(int) player_id];
+        
+
+       
+        NetworkServer.Spawn(snowball);
+        //IgnoreCol(snowball, player);
+    }
+
+    
+
+   
+
+
 }
