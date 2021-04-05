@@ -17,6 +17,8 @@ public class Player : NetworkBehaviour
     public Vector3 Position;
     [SyncVar]
     public float AngularVelocity;
+    float last_sync = 0.0f;
+    public float sync_cd = 0.1f;
 
 
 
@@ -27,12 +29,10 @@ public class Player : NetworkBehaviour
     PathDrawer pd;
 
     SyncList<Vector3> positions = new SyncList<Vector3>();
-    public float sync_cd = 0.1f;
 
     public GameObject prefab_lr_holder;
 
 
-    float last_sync = 0.0f;
     public float max_height = 2f;
 
     float curr_height = 0f;
@@ -170,8 +170,20 @@ public class Player : NetworkBehaviour
                 //CmdAddForce(Vector3.up * speed / 5);
                 CmdPlayerJump(); // send msg to server
             }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+
+                //CmdAddForce(Vector3.up * speed / 5);
+
+                var mouse = new Vector2(Camera.main.ScreenToWorldPoint(Input.mousePosition).x, Camera.main.ScreenToWorldPoint(Input.mousePosition).y);
+                var dir = (mouse - rb.position).normalized;
+                CmdSpawnSnowball(rb.position, dir, netId); // send msg to server
+            }
         }
     }
+
+   
 
     private void HandleJumping()
     {
@@ -266,6 +278,13 @@ public class Player : NetworkBehaviour
     }
 
 
+    [Command]
+    private void CmdSpawnSnowball(Vector2 pos, Vector2 dir, uint id)
+    {
+        FindObjectOfType<Server>().AddSnowball(pos, dir, gameObject);
+        //GameObject player = (GameObject)Instantiate(playerPrefab, position, Quaternion.identity);
+        //NetworkServer.AddPlayerForConnection(conn, player);
+    }
     [Command]
     private void CmdSetPosition(Vector2 position)
     {

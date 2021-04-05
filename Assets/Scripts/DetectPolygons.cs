@@ -26,7 +26,6 @@ public class DetectPolygons : MonoBehaviour
         var paths = pds.Where(pd => !pd.cut).Select(pd => (pd, pd.positions)).ToList();
 
         FindPolygon(paths);
-        Debug.Log(paths.Count());
     }
 
     void FindPolygon(List<(PathDrawer, List<Vector3>)> paths)
